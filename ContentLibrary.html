@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f4f4;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #161616;
+            color: #ffffff;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 25px;
+            color: #c6c6c6;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 1.1em;
+            border: 1px solid #8d8d8d;
+            border-radius: 4px;
+            outline: none;
+            background: #ffffff;
+            color: #161616;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #0f62fe;
+            box-shadow: 0 0 0 2px rgba(15, 98, 254, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #525252;
+            font-size: 1.2em;
+            pointer-events: none;
+        }
+
+        .content-section {
+            padding: 40px;
+            background: #ffffff;
+        }
+
+        .content-list {
+            list-style: none;
+        }
+
+        .folder-item {
+            margin-bottom: 8px;
+        }
+
+        .folder-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #e8e8e8;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .folder-header:hover {
+            background: #d4d4d4;
+            border-left-color: #0f62fe;
+        }
+
+        .folder-icon {
+            margin-right: 12px;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+            color: #525252;
+        }
+
+        .folder-header.expanded .folder-icon {
+            transform: rotate(90deg);
+        }
+
+        .folder-name {
+            font-weight: 600;
+            color: #161616;
+            font-size: 1.1em;
+        }
+
+        .folder-content {
+            margin-left: 30px;
+            margin-top: 8px;
+            display: none;
+            border-left: 2px solid #e0e0e0;
+            padding-left: 20px;
+        }
+
+        .folder-header.expanded + .folder-content {
+            display: block;
+        }
+
+        .subfolder-item {
+            margin-bottom: 8px;
+        }
+
+        .subfolder-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #f4f4f4;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .subfolder-header:hover {
+            background: #e8e8e8;
+            border-left-color: #0f62fe;
+        }
+
+        .subfolder-icon {
+            margin-right: 10px;
+            font-size: 1em;
+            transition: transform 0.3s ease;
+            color: #525252;
+        }
+
+        .subfolder-header.expanded .subfolder-icon {
+            transform: rotate(90deg);
+        }
+
+        .subfolder-name {
+            font-weight: 500;
+            color: #161616;
+            font-size: 1em;
+        }
+
+        .subfolder-content {
+            margin-left: 25px;
+            margin-top: 6px;
+            display: none;
+            border-left: 2px solid #e0e0e0;
+            padding-left: 15px;
+        }
+
+        .subfolder-header.expanded + .subfolder-content {
+            display: block;
+        }
+
+        .content-item {
+            margin-bottom: 8px;
+            background: #f4f4f4;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .content-item:hover {
+            background: #e8e8e8;
+            border-left-color: #0f62fe;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-item.hidden {
+            display: none;
+        }
+
+        .content-link {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #161616;
+            font-size: 1em;
+            font-weight: 400;
+            position: relative;
+        }
+
+        .content-link::before {
+            content: '📄';
+            margin-right: 10px;
+            font-size: 1em;
+        }
+
+        .content-link::after {
+            content: '→';
+            position: absolute;
+            right: 20px;
+            color: #525252;
+            font-size: 1.2em;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .content-item:hover .content-link::after {
+            transform: translateX(5px);
+            color: #0f62fe;
+        }
+
+        .content-link:hover {
+            color: #0f62fe;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #525252;
+            font-size: 1.1em;
+            display: none;
+        }
+
+        .no-results.show {
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6f6f6f;
+            font-size: 0.9em;
+            border-top: 1px solid #e0e0e0;
+            background: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Content Library</h1>
+            <p>Click on any content to open the document</p>
+            <div class="search-container">
+                <input type="text" 
+                       class="search-box" 
+                       id="searchInput" 
+                       placeholder="Search content...">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="no-results" id="noResults">
+                No content found matching your search.
+            </div>
+            <ul class="content-list" id="contentList">
+                <!-- Folder 1 -->
+                <li class="folder-item" data-folder="Marketing Materials">
+                    <div class="folder-header">
+                        <span class="folder-icon">▶</span>
+                        <span class="folder-name">Consent Management</span>
+                    </div>
+                    <ul class="folder-content">
+                        <!-- Subfolder 1.1 -->
+                        <li class="subfolder-item" data-subfolder="Social Media">
+                            <div class="subfolder-header">
+                                <span class="subfolder-icon">▶</span>
+                                <span class="subfolder-name">Web</span>
+                            </div>
+                            <ul class="subfolder-content">
+                                <li class="content-item" data-content="Social Media Campaign 1">
+                                    <a href="https://g10x.sharepoint.com/:w:/r/sites/UNDERARMOUR/_layouts/15/Doc.aspx?sourcedoc=%7B1C6F2B85-91AF-4ED4-BEC3-605D8FE71C7B%7D&file=UA_EmailConsentViaWeb.docx&action=default&mobileredirect=true" target="_blank" class="content-link">
+                                        UA_EmailConsentViaWeb
+                                    </a>
+                                </li>
+                         <!--       <li class="content-item" data-content="Social Media Campaign 2">
+                                    <a href="marketing/social-media/campaign2.docx" target="_blank" class="content-link">
+                                        Social Media Campaign 2
+                                    </a>
+                                </li> -->
+                            </ul>
+                        </li>
+                        <!-- Subfolder 1.2 -->
+                        <li class="subfolder-item" data-subfolder="Email Campaigns">
+                            <div class="subfolder-header">
+                                <span class="subfolder-icon">▶</span>
+                                <span class="subfolder-name">Email</span>
+                            </div>
+                            <ul class="subfolder-content">
+                                <li class="content-item" data-content="Email Template 1">
+                                    <a href="https://g10x.sharepoint.com/:w:/r/sites/UNDERARMOUR/_layouts/15/Doc.aspx?sourcedoc=%7B906AD105-1CF9-478E-834C-D4065A755CE2%7D&file=UA_MTEC-240_Email_Unsubscirbe.docx&action=default&mobileredirect=true" target="_blank" class="content-link">
+                                        UA_MTEC-240_Email_Unsubscirbe
+                                    </a>
+                                </li>
+                          <!--      <li class="content-item" data-content="Email Template 2">
+                                    <a href="marketing/email/template2.docx" target="_blank" class="content-link">
+                                        
+                                    </a>
+                                </li> -->
+                            </ul>
+                        </li>
+						<li class="subfolder-item" data-subfolder="Email Campaigns">
+                            <div class="subfolder-header">
+                                <span class="subfolder-icon">▶</span>
+                                <span class="subfolder-name">SMS</span>
+                            </div>
+                            <ul class="subfolder-content">
+                                <li class="content-item" data-content="Email Template 1">
+                                    <a href="marketing/email/template1.docx" target="_blank" class="content-link">
+                                        UA_SFMC_3026_SMS_OptinViaCloudpage
+                                    </a>
+                                </li>
+                           <!--     <li class="content-item" data-content="Email Template 2">
+                                    <a href="marketing/email/template2.docx" target="_blank" class="content-link">
+                                        Email Template 2
+                                    </a>
+                                </li> -->
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+
+
+   <!-- Folder 2 -->
+                <li class="folder-item" data-folder="Marketing Comms">
+                    <div class="folder-header">
+                        <span class="folder-icon">▶</span>
+                        <span class="folder-name">Marketing Comms</span>
+                    </div>
+                    <ul class="folder-content">
+                        <li class="content-item" data-content="Training Module 1">
+                            <a href="training/module1.docx" target="_blank" class="content-link">
+                                Notify Me
+                            </a>
+                        </li>
+                    <!--    <li class="content-item" data-content="Training Module 2">
+                            <a href="training/module2.docx" target="_blank" class="content-link">
+                                Training Module 2
+                            </a>
+                        </li> -->
+                    </ul>
+                </li>
+
+                <!-- Folder 3 -->
+                <li class="folder-item" data-folder="Training Materials">
+                    <div class="folder-header">
+                        <span class="folder-icon">▶</span>
+                        <span class="folder-name">DataModel</span>
+                    </div>
+                    <ul class="folder-content">
+                        <li class="content-item" data-content="Training Module 1">
+                            <a href="https://g10x.sharepoint.com/sites/UNDERARMOUR/Shared%20Documents/Forms/AllItems.aspx?ovuser=17a0b19d%2D6869%2D4317%2D96e4%2D3d8d27cc76f8%2CAparna%2EShouri%40g10x%2Ecom&OR=Teams%2DHL&CT=1770910704196&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNjAxMTUxMTExMyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D&id=%2Fsites%2FUNDERARMOUR%2FShared%20Documents%2FProjects%2FDevelopment%2FSFMC%2FReference%20Documents%2FSFMC%5FUA%5FKnowledge%5FRepository%2FDatamodel%2Esvg&parent=%2Fsites%2FUNDERARMOUR%2FShared%20Documents%2FProjects%2FDevelopment%2FSFMC%2FReference%20Documents%2FSFMC%5FUA%5FKnowledge%5FRepository" target="_blank" class="content-link">
+                                Data Model Diagram
+                            </a>
+                        </li>
+                   <!--     <li class="content-item" data-content="Training Module 2">
+                            <a href="training/module2.docx" target="_blank" class="content-link">
+                                Training Module 2
+                            </a>
+                        </li> --> 
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>Content Library &copy; 2025</p>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const contentItems = document.querySelectorAll('.content-item');
+        const folderHeaders = document.querySelectorAll('.folder-header');
+        const subfolderHeaders = document.querySelectorAll('.subfolder-header');
+        const noResults = document.getElementById('noResults');
+        const folders = document.querySelectorAll('.folder-item');
+        const subfolders = document.querySelectorAll('.subfolder-item');
+
+        // Toggle folder expansion
+        folderHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                this.classList.toggle('expanded');
+            });
+        });
+
+        // Toggle subfolder expansion
+        subfolderHeaders.forEach(header => {
+            header.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.classList.toggle('expanded');
+            });
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            if (searchTerm === '') {
+                // Reset all items to visible
+                contentItems.forEach(item => {
+                    item.classList.remove('hidden');
+                });
+                folders.forEach(folder => {
+                    folder.style.display = '';
+                });
+                subfolders.forEach(subfolder => {
+                    subfolder.style.display = '';
+                });
+                noResults.classList.remove('show');
+                return;
+            }
+
+            // Search through content items
+            contentItems.forEach((item) => {
+                const contentText = item.getAttribute('data-content').toLowerCase();
+                const linkText = item.querySelector('.content-link').textContent.toLowerCase();
+                
+                if (contentText.includes(searchTerm) || linkText.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                    visibleCount++;
+                    
+                    // Expand parent folders
+                    const subfolder = item.closest('.subfolder-item');
+                    const folder = item.closest('.folder-item');
+                    
+                    if (subfolder) {
+                        const subfolderHeader = subfolder.querySelector('.subfolder-header');
+                        subfolderHeader.classList.add('expanded');
+                        subfolder.style.display = '';
+                    }
+                    
+                    if (folder) {
+                        const folderHeader = folder.querySelector('.folder-header');
+                        folderHeader.classList.add('expanded');
+                        folder.style.display = '';
+                    }
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            // Hide folders/subfolders with no visible content
+            folders.forEach(folder => {
+                const visibleItems = folder.querySelectorAll('.content-item:not(.hidden)');
+                if (visibleItems.length === 0) {
+                    folder.style.display = 'none';
+                } else {
+                    folder.style.display = '';
+                }
+            });
+
+            subfolders.forEach(subfolder => {
+                const visibleItems = subfolder.querySelectorAll('.content-item:not(.hidden)');
+                if (visibleItems.length === 0) {
+                    subfolder.style.display = 'none';
+                } else {
+                    subfolder.style.display = '';
+                }
+            });
+
+            // Show/hide "no results" message
+            if (visibleCount === 0) {
+                noResults.classList.add('show');
+            } else {
+                noResults.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
